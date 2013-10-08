@@ -1,0 +1,42 @@
+--- ts-3.3.5/proxy/PluginVC.cc	2013-08-08 15:11:53.000000000 +0800
++++ ts-3.3.5-new/proxy/PluginVC.cc	2013-08-15 13:18:14.000000000 +0800
+@@ -127,7 +127,8 @@
+     read_mutex_held = MUTEX_TAKE_TRY_LOCK(read_side_mutex, my_ethread);
+ 
+     if (!read_mutex_held) {
+-      call_event->schedule_in(PVC_LOCK_RETRY_TIME);
++      if (call_event != inactive_event)
++        call_event->schedule_in(PVC_LOCK_RETRY_TIME);
+       return 0;
+     }
+ 
+@@ -135,7 +136,8 @@
+       // It's possible some swapped the mutex on us before
+       //  we were able to grab it
+       Mutex_unlock(read_side_mutex, my_ethread);
+-      call_event->schedule_in(PVC_LOCK_RETRY_TIME);
++      if (call_event != inactive_event)
++        call_event->schedule_in(PVC_LOCK_RETRY_TIME);
+       return 0;
+     }
+   }
+@@ -147,7 +149,8 @@
+       if (read_mutex_held) {
+         Mutex_unlock(read_side_mutex, my_ethread);
+       }
+-      call_event->schedule_in(PVC_LOCK_RETRY_TIME);
++      if (call_event != inactive_event)
++        call_event->schedule_in(PVC_LOCK_RETRY_TIME);
+       return 0;
+     }
+ 
+@@ -158,7 +161,8 @@
+       if (read_mutex_held) {
+         Mutex_unlock(read_side_mutex, my_ethread);
+       }
+-      call_event->schedule_in(PVC_LOCK_RETRY_TIME);
++      if (call_event != inactive_event)
++        call_event->schedule_in(PVC_LOCK_RETRY_TIME);
+       return 0;
+     }
+   }
